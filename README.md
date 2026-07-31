@@ -40,3 +40,23 @@
 
 ## 🤝 Contribuição
 Sinta-se à vontade para fazer um **Fork** deste projeto, abrir **Issues** relatando bugs ou enviar **Pull Requests** com melhorias! Como baixar músicas e vídeos é uma necessidade comum, toda ajuda para manter o motor e a interface atualizados é bem-vinda.
+
+---
+
+## ☕ Apoie o Projeto
+
+O V-Link é uma ferramenta de código aberto e 100% gratuita. Se este programa te ajudou a economizar tempo no seu trabalho ou dia a dia, considere pagar um café para o desenvolvedor! ❤️
+
+**Doe via PIX:**
+Escaneie o QR Code abaixo com o app do seu banco ou use a chave copia e cola.
+
+<img src="qrcode.jpeg" width="250" alt="QR Code PIX PagBank">
+
+**Chave PIX:** `c662eeb2-6e5d-4746-a85e-00b6fce87dec` 
+*(Nome: Vinicius Resende Cardoso - PagBank)*
+
+<br>
+
+<a href="https://ko-fi.com/vvinzx" target="_blank">
+  <img src="https://cdn.ko-fi.com/cdn/kofi2.png?v=3" height="36" alt="Buy Me a Coffee at ko-fi.com" />
+</a>
