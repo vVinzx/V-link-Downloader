@@ -1,7 +1,19 @@
-const { app, BrowserWindow, ipcMain, dialog, shell, Menu } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
-const { spawn } = require('child_process');
 const fs = require('fs');
+const { spawn } = require('child_process');
+
+// Identifica se o app está rodando instalado (.exe) ou em desenvolvimento
+const isDev = !app.isPackaged;
+
+// Define o caminho correto para o yt-dlp e o ffmpeg em ambos os cenários
+const ytdlpPath = isDev
+  ? path.join(__dirname, 'bin', 'yt-dlp.exe')
+  : path.join(process.resourcesPath, 'bin', 'yt-dlp.exe');
+
+const ffmpegPath = isDev
+  ? path.join(__dirname, 'bin', 'ffmpeg.exe')
+  : path.join(process.resourcesPath, 'bin', 'ffmpeg.exe');
 
 function createWindow() {
     const win = new BrowserWindow({
@@ -67,8 +79,8 @@ ipcMain.handle('select-txt', async () => {
 
 ipcMain.handle('update-engine', async () => {
     return new Promise((resolve) => {
-        const ytDlpPath = path.join(__dirname, 'bin', 'yt-dlp.exe');
-        const updater = spawn(ytDlpPath, ['-U']); 
+        // Agora usa o ytdlpPath global configurado no topo
+        const updater = spawn(ytdlpPath, ['-U']); 
         let output = '';
         updater.stdout.on('data', (data) => output += data.toString());
         updater.stderr.on('data', (data) => output += data.toString());
@@ -82,8 +94,7 @@ ipcMain.handle('update-engine', async () => {
 
 // A MÁGICA DA QUALIDADE ESTÁ AQUI
 ipcMain.on('start-download', (event, data) => {
-    const { url, format, folder, isPlaylist, quality } = data; // Recebe a qualidade
-    const ytDlpPath = path.join(__dirname, 'bin', 'yt-dlp.exe');
+    const { url, format, folder, isPlaylist, quality } = data; 
     
     let args = [
         isPlaylist ? '--yes-playlist' : '--no-playlist',
@@ -95,8 +106,7 @@ ipcMain.on('start-download', (event, data) => {
     if (format === 'mp3') {
         args.push('-x', '--audio-format', 'mp3', '-o', path.join(folder, '%(title)s.%(ext)s'), url);
     } else {
-        // Configura o comando de acordo com a qualidade selecionada
-        let formatString = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'; // Padrão "best"
+        let formatString = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'; 
         
         if (quality === '1080') {
             formatString = 'bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4][height<=1080]/best';
@@ -109,7 +119,8 @@ ipcMain.on('start-download', (event, data) => {
         args.push('-f', formatString, '--merge-output-format', 'mp4', '-o', path.join(folder, '%(title)s.%(ext)s'), url);
     }
 
-    const downloadProcess = spawn(ytDlpPath, args);
+    // Agora usa o ytdlpPath global configurado no topo
+    const downloadProcess = spawn(ytdlpPath, args);
 
     downloadProcess.stdout.on('data', (output) => {
         const text = output.toString();
