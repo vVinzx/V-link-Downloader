@@ -50,7 +50,7 @@ O V-Link é uma ferramenta de código aberto e 100% gratuita. Se este programa t
 **Doe via PIX:**
 Escaneie o QR Code abaixo com o app do seu banco ou use a chave copia e cola.
 
-<img src="qrcode.jpeg" width="250" alt="QR Code PIX PagBank">
+<img src="qrcode.jpg" width="250" alt="QR Code PIX PagBank">
 
 **Chave PIX:** `c662eeb2-6e5d-4746-a85e-00b6fce87dec` 
 *(Nome: Vinicius Resende Cardoso - PagBank)*
