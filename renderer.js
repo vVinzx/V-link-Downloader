@@ -75,13 +75,15 @@ document.getElementById('btnDownload').addEventListener('click', () => {
         return;
     }
 
+    // 👇 AQUI ESTAVA O ERRO! Agora com os nomes exatos do seu HTML
     const format = document.querySelector('input[name="format"]:checked').value;
     const isPlaylist = document.getElementById('checkPlaylist').checked;
-    const quality = qualitySelect.value; // Pega a qualidade
+    const quality = document.getElementById('qualitySelect').value;
+    const browser = document.getElementById('browserSelect').value;
 
     adicionarNaFila(url);
-    window.api.startDownload({ url, format, folder: currentFolder, isPlaylist, quality });
-    document.getElementById('urlInput').value = ''; 
+    
+    window.api.startDownload({ url, format, folder: currentFolder, isPlaylist, quality, browser });
 });
 
 // 7. Carregar Arquivo TXT
@@ -95,11 +97,13 @@ document.getElementById('btnLoadTxt').addEventListener('click', async () => {
         const format = document.querySelector('input[name="format"]:checked').value;
         const isPlaylist = document.getElementById('checkPlaylist').checked;
         const quality = qualitySelect.value; // Pega a qualidade
-        
+
+        const browser = document.getElementById('browserSelect').value;
+
         links.forEach(url => {
             if (url.startsWith('http')) {
                 adicionarNaFila(url);
-                window.api.startDownload({ url, format, folder: currentFolder, isPlaylist, quality });
+                window.api.startDownload({ url, format, folder: currentFolder, isPlaylist, quality, browser });
             }
         });
     }

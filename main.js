@@ -94,19 +94,28 @@ ipcMain.handle('update-engine', async () => {
 
 // A MÁGICA DA QUALIDADE ESTÁ AQUI
 ipcMain.on('start-download', (event, data) => {
-    const { url, format, folder, isPlaylist, quality } = data; 
+    // Adicione o browser aqui na lista de recebimento:
+    const { url, format, folder, isPlaylist, quality, browser } = data; 
     
-    let args = [
+   let args = [
+        '--ffmpeg-location', ffmpegPath,
+        
+        // 👇 A MÁGICA ACONTECE AQUI: Desativamos os cookies com as duas barras!
+        // '--cookies-from-browser', browser, 
+        
+        // 👇 E voltamos para o disfarce puro de celular, que não exige o teste de JavaScript
+        '--extractor-args', 'youtube:player_client=ios,android', 
+        
         isPlaylist ? '--yes-playlist' : '--no-playlist',
         '--embed-thumbnail', 
         '--add-metadata',    
         '--newline'
     ];
-    
+
     if (format === 'mp3') {
         args.push('-x', '--audio-format', 'mp3', '-o', path.join(folder, '%(title)s.%(ext)s'), url);
     } else {
-        let formatString = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best'; 
+        let formatString = 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best';
         
         if (quality === '1080') {
             formatString = 'bestvideo[ext=mp4][height<=1080]+bestaudio[ext=m4a]/best[ext=mp4][height<=1080]/best';
@@ -115,12 +124,16 @@ ipcMain.on('start-download', (event, data) => {
         } else if (quality === '480') {
             formatString = 'bestvideo[ext=mp4][height<=480]+bestaudio[ext=m4a]/best[ext=mp4][height<=480]/best';
         }
-        
+
         args.push('-f', formatString, '--merge-output-format', 'mp4', '-o', path.join(folder, '%(title)s.%(ext)s'), url);
     }
 
     // Agora usa o ytdlpPath global configurado no topo
     const downloadProcess = spawn(ytdlpPath, args);
+    // ESPIÃO DE ERROS DO YT-DLP
+    downloadProcess.stderr.on('data', (err) => {
+        console.error('🔴 ALARME DE ERRO:', err.toString());
+    });
 
     downloadProcess.stdout.on('data', (output) => {
         const text = output.toString();
