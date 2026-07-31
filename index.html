@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-Link Media Downloader</title>
+    <style>
+        :root {
+            --bg-color: #0f172a; --card-bg: #1e293b; --primary: #3b82f6;
+            --primary-hover: #2563eb; --text-main: #f8fafc; --text-muted: #94a3b8;
+            --success: #10b981; --error: #ef4444; --border: #334155;
+        }
+
+        body.light-mode {
+            --bg-color: #f1f5f9; --card-bg: #ffffff; --primary: #2563eb;
+            --primary-hover: #1d4ed8; --text-main: #0f172a; --text-muted: #475569;
+            --success: #059669; --error: #dc2626; --border: #cbd5e1;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg-color); color: var(--text-main); padding: 20px; display: flex; flex-direction: column; gap: 20px; height: 100vh; transition: background-color 0.3s, color 0.3s; }
+        
+        .header-container { display: flex; justify-content: space-between; align-items: center; }
+        h2 { font-size: 1.8rem; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
+        .subtitle { font-size: 1.1rem; color: var(--text-muted); font-weight: normal; margin-left: 5px; border-left: 2px solid var(--border); padding-left: 10px;}
+        h3 { font-size: 1.1rem; margin-bottom: 10px; color: var(--text-muted); border-bottom: 1px solid var(--border); padding-bottom: 5px; display: flex; align-items: center; gap: 8px;}
+        
+        .card { background-color: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: background-color 0.3s; }
+        .controls-group { display: flex; gap: 10px; margin-bottom: 15px; align-items: center; flex-wrap: wrap; }
+        input[type="text"] { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background-color: var(--bg-color); color: var(--text-main); outline: none; font-size: 1rem; transition: background-color 0.3s; }
+        input[type="text"]:focus { border-color: var(--primary); }
+        
+        button { padding: 12px 20px; border-radius: 8px; border: none; background-color: var(--primary); color: white; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        button:hover { background-color: var(--primary-hover); }
+        button.secondary { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); }
+        button.secondary:hover { background-color: rgba(59, 130, 246, 0.1); border-color: var(--primary); color: var(--primary); }
+        button.action-btn { padding: 8px 12px; font-size: 0.9rem; }
+        
+        .radio-group { display: flex; gap: 15px; align-items: center; background: var(--bg-color); padding: 10px 15px; border-radius: 8px; border: 1px solid var(--border); transition: background-color 0.3s; }
+        .radio-group label { cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 500; font-size: 0.95rem; }
+        
+        select { background: var(--bg-color); color: var(--text-main); border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; outline: none; font-weight: 500; cursor: pointer; transition: 0.3s; }
+        select:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .lists-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; flex: 1; overflow: hidden; }
+        .list-box { background-color: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; transition: background-color 0.3s; }
+        .list-box h3.success { color: var(--success); border-color: var(--success); }
+        .list-box h3.error { color: var(--error); border-color: var(--error); }
+        
+        ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        li { background: var(--bg-color); padding: 10px; border-radius: 8px; font-size: 0.9rem; border: 1px solid var(--border); position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.3s;}
+        .link-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; z-index: 2; position: relative; flex: 1; }
+        .progress-bar { position: absolute; top: 0; left: 0; height: 100%; background-color: rgba(59, 130, 246, 0.2); width: 0%; z-index: 1; transition: width 0.3s ease, background-color 0.3s ease; }
+        
+        .help-icon { cursor: help; color: var(--primary); font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <h2>
+            <img src="icon.png" width="32" height="32" style="border-radius: 8px;" alt="Logo"> 
+            V-Link <span class="subtitle">Media Downloader</span>
+        </h2>
+        <div style="display: flex; gap: 10px;">
+            <button id="btnTheme" class="secondary action-btn" title="Alternar Modo Claro/Escuro">☀️</button>
+            <button id="btnUpdateEngine" class="secondary action-btn" title="Baixa a versão mais nova do motor contra bloqueios do YouTube.">🔄 Atualizar Motor</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="controls-group">
+            <button class="secondary" id="btnFolder">📂 Escolher onde Salvar</button>
+            <input type="text" id="folderPath" placeholder="Nenhuma pasta selecionada..." disabled>
+            <button id="btnOpenFolder" class="secondary" style="display: none;" title="Abrir pasta no Windows">📁 Abrir Pasta</button>
+            
+            <div class="radio-group">
+                <label title="Converte vídeos em música MP3."><input type="radio" name="format" value="mp3" checked> 🎵 Áudio</label>
+                <label title="Baixa o vídeo completo."><input type="radio" name="format" value="mp4"> 🎬 Vídeo</label>
+                
+                <div style="border-left: 1px solid var(--border); height: 20px; margin: 0 5px;"></div>
+                
+                <!-- Nova Seleção de Qualidade -->
+                <select id="qualitySelect" disabled title="Escolha a resolução do vídeo">
+                    <option value="best">👑 Melhor Qualidade</option>
+                    <option value="1080">📺 1080p (Full HD)</option>
+                    <option value="720">📺 720p (HD)</option>
+                    <option value="480">📱 480p (SD)</option>
+                </select>
+
+                <div style="border-left: 1px solid var(--border); height: 20px; margin: 0 5px;"></div>
+                <label title="Marque para baixar todos os vídeos de uma Playlist."><input type="checkbox" id="checkPlaylist"> 🗂️ Playlist</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="controls-group">
+            <input type="text" id="urlInput" placeholder="Clique aqui para colar seu link (YouTube, Reels, Shorts, TikTok, etc)...">
+            <button id="btnDownload">Baixar Link</button>
+            <button class="secondary" id="btnLoadTxt">📄 Carregar Lista (.txt)</button>
+        </div>
+    </div>
+
+    <div class="lists-container">
+        <div class="list-box">
+            <h3>⏳ Fila / Baixando</h3>
+            <ul id="queueList"></ul>
+        </div>
+        <div class="list-box" style="display: flex; flex-direction: column; gap: 20px;">
+            <div>
+                <h3 class="success">✅ Concluídos</h3>
+                <ul id="successList"></ul>
+            </div>
+            <div>
+                <h3 class="error" title="Alguns links podem falhar se o vídeo for privado ou bloqueado. Se tudo falhar, atualize o motor!">❌ Falharam <span class="help-icon">❓</span></h3>
+                <ul id="errorList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="./renderer.js"></script>
+</body>
+</html>
